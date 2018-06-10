@@ -1,0 +1,1375 @@
+#include "nw_i0_plot"
+#include "x2_inc_spellhook"
+#include "val_inc_prestcl1"
+#include "x2_inc_itemprop"
+//Script made by Drakaden
+void main()
+{
+
+object oPC;
+object oModule = GetModule();
+object oTaron = GetObjectByTag("TaronGuard1");
+object oTaronArmy = GetObjectByTag("TaronSoldier1");
+object oAthedia = GetObjectByTag("AthediaGuard1");
+object oAthediaArmy = GetObjectByTag("AthediaSoldier1");
+object oEmpyria = GetObjectByTag("EmpyriaGuard1");
+object oEmpyriaArmy = GetObjectByTag("EmpyriaSoldier1");
+object oDalmar = GetObjectByTag("DalmarGuard1");
+object oDalmarArmy = GetObjectByTag("DalmarSoldier1");
+object oBountyHunters = GetObjectByTag("BountyHunter1");
+object oOrcs = GetObjectByTag("Orc1");
+object oThieves = GetObjectByTag("Bandit1");
+object oItemSlot;
+object oNearestPC;
+object oParty;
+object oOrb;
+
+effect eACDecrease;
+effect eACIncrease;
+effect eSpell;
+eSpell = GetFirstEffect(oPC);
+
+int iRollFour;
+int iPlayerSpeak1;
+int iMovementRate1;
+int iPlayerAround1;
+int iPlayerRank;
+
+string sArmySide;
+string sDayType1;
+
+switch (GetUserDefinedEventNumber())
+{
+//Save all characters
+case 200:
+ExportAllCharacters();
+DelayCommand(300.0, SignalEvent(OBJECT_SELF, EventUserDefined(200)));
+break;
+
+//Change weather
+case 201:
+
+iRollFour = d4(1);
+
+switch (iRollFour)
+{
+case 1:
+SetWeather(oModule, WEATHER_CLEAR);
+break;
+case 2:
+SetWeather(oModule, WEATHER_RAIN);
+break;
+case 3:
+SetWeather(oModule, WEATHER_CLEAR);
+break;
+case 4:
+SetWeather(oModule, WEATHER_CLEAR);
+break;
+}
+
+DelayCommand(1000.0 + IntToFloat(Random(1000)), SignalEvent(OBJECT_SELF, EventUserDefined(201)));
+break;
+
+//Save time
+case 202:
+
+SetCampaignInt("Valikorlia", "YearTime", GetCalendarYear());
+SetCampaignInt("Valikorlia", "MonthTime", GetCalendarMonth());
+SetCampaignInt("Valikorlia", "DayTime", GetCalendarDay());
+SetCampaignInt("Valikorlia", "HourTime", GetTimeHour());
+DelayCommand(300.0, SignalEvent(OBJECT_SELF, EventUserDefined(202)));
+
+break;
+
+//Save factions
+case 203:
+
+oPC = GetFirstPC();
+
+while (GetIsObjectValid(oPC))
+{
+
+if (GetFactionAverageReputation(oTaron, oPC) >= 0 &&
+GetCampaignInt("Valikorlia", "iReady", oPC) == 2)
+{
+SetCampaignInt("Valikorlia", "ReputationTaron", GetFactionAverageReputation(oTaron, oPC), oPC);
+}
+else
+{
+SetCampaignInt("Valikorlia", "ReputationTaron", 50, oPC);
+if (GetFactionAverageReputation(oTaron, oPC) <= 49)
+{
+AdjustReputation(oPC, oTaron, 50);
+}
+
+}
+
+if (GetFactionAverageReputation(oTaronArmy, oPC) >= 0 &&
+GetCampaignInt("Valikorlia", "iReady", oPC) == 2)
+{
+SetCampaignInt("Valikorlia", "ReputationTaronArmy", GetFactionAverageReputation(oTaronArmy, oPC), oPC);
+}
+else
+{
+SetCampaignInt("Valikorlia", "ReputationTaronArmy", 50, oPC);
+if (GetFactionAverageReputation(oTaronArmy, oPC) <= 49)
+{
+AdjustReputation(oPC, oTaronArmy, 50);
+}
+
+}
+
+if (GetFactionAverageReputation(oAthedia, oPC) >= 0 &&
+GetCampaignInt("Valikorlia", "iReady", oPC) == 2)
+{
+SetCampaignInt("Valikorlia", "ReputationAthedia", GetFactionAverageReputation(oAthedia, oPC), oPC);
+}
+else
+{
+SetCampaignInt("Valikorlia", "ReputationAthedia", 50, oPC);
+if (GetFactionAverageReputation(oAthedia, oPC) <= 49)
+{
+AdjustReputation(oPC, oAthedia, 50);
+}
+
+}
+
+if (GetFactionAverageReputation(oAthediaArmy, oPC) >= 0 &&
+GetCampaignInt("Valikorlia", "iReady", oPC) == 2)
+{
+SetCampaignInt("Valikorlia", "ReputationAthediaArmy", GetFactionAverageReputation(oAthediaArmy, oPC), oPC);
+}
+else
+{
+SetCampaignInt("Valikorlia", "ReputationAthediaArmy", 50, oPC);
+if (GetFactionAverageReputation(oAthediaArmy, oPC) <= 49)
+{
+AdjustReputation(oPC, oAthediaArmy, 50);
+}
+
+}
+
+if (GetFactionAverageReputation(oEmpyria, oPC) >= 0 &&
+GetCampaignInt("Valikorlia", "iReady", oPC) == 2)
+{
+SetCampaignInt("Valikorlia", "ReputationEmpyria", GetFactionAverageReputation(oEmpyria, oPC), oPC);
+}
+else
+{
+SetCampaignInt("Valikorlia", "ReputationEmpyria", 50, oPC);
+if (GetFactionAverageReputation(oEmpyria, oPC) <= 49)
+{
+AdjustReputation(oPC, oEmpyria, 50);
+}
+
+}
+
+if (GetFactionAverageReputation(oEmpyriaArmy, oPC) >= 0 &&
+GetCampaignInt("Valikorlia", "iReady", oPC) == 2)
+{
+SetCampaignInt("Valikorlia", "ReputationEmpyriaArmy", GetFactionAverageReputation(oEmpyriaArmy, oPC), oPC);
+}
+else
+{
+SetCampaignInt("Valikorlia", "ReputationEmpyriaArmy", 50, oPC);
+if (GetFactionAverageReputation(oEmpyriaArmy, oPC) <= 49)
+{
+AdjustReputation(oPC, oEmpyriaArmy, 50);
+}
+
+}
+
+if (GetFactionAverageReputation(oDalmar, oPC) >= 0 &&
+GetCampaignInt("Valikorlia", "iReady", oPC) == 2)
+{
+SetCampaignInt("Valikorlia", "ReputationDalmar", GetFactionAverageReputation(oDalmar, oPC), oPC);
+}
+else
+{
+SetCampaignInt("Valikorlia", "ReputationDalmar", 50, oPC);
+if (GetFactionAverageReputation(oDalmar, oPC) <= 49)
+{
+AdjustReputation(oPC, oDalmar, 50);
+}
+
+}
+
+if (GetFactionAverageReputation(oDalmarArmy, oPC) >= 0 &&
+GetCampaignInt("Valikorlia", "iReady", oPC) == 2)
+{
+SetCampaignInt("Valikorlia", "ReputationDalmarArmy", GetFactionAverageReputation(oDalmarArmy, oPC), oPC);
+}
+else
+{
+SetCampaignInt("Valikorlia", "ReputationDalmarArmy", 50, oPC);
+if (GetFactionAverageReputation(oDalmarArmy, oPC) <= 49)
+{
+AdjustReputation(oPC, oDalmarArmy, 50);
+}
+
+}
+
+if (GetStandardFactionReputation(STANDARD_FACTION_DEFENDER, oPC) >= 0 &&
+GetCampaignInt("Valikorlia", "iReady", oPC) == 2)
+{
+SetCampaignInt("Valikorlia", "ReputationDefender", GetStandardFactionReputation(STANDARD_FACTION_DEFENDER, oPC), oPC);
+}
+else
+{
+SetCampaignInt("Valikorlia", "ReputationDefender", 50, oPC);
+}
+
+DelayCommand(20.0, SignalEvent(OBJECT_SELF, EventUserDefined(203)));
+
+oPC = GetNextPC();
+
+}
+
+break;
+
+//Check for rust under bad weather
+case 204:
+
+oPC = GetFirstPC();
+
+while (GetIsObjectValid(oPC))
+{
+if (GetWeather(GetArea(oPC)) == WEATHER_RAIN ||
+GetWeather(GetArea(oPC)) == WEATHER_SNOW)
+{
+
+itemproperty ipRust;
+
+oItemSlot = GetItemInSlot(INVENTORY_SLOT_CHEST, oPC);
+
+if (GetItemACValue(oItemSlot) >= 4 &&
+GetLocalInt(oItemSlot, "RustProtect") != 1 &&
+d20(1) >= 18 ||
+GetItemACValue(oItemSlot) >= 4 &&
+GetLocalInt(oItemSlot, "Oiled1") != 1 &&
+d20(1) >= 18)
+{
+ipRust = ItemPropertyDecreaseAC(IP_CONST_ACMODIFIERTYPE_ARMOR, 1);
+
+IPSafeAddItemProperty(oItemSlot, ipRust, 0.0f, X2_IP_ADDPROP_POLICY_IGNORE_EXISTING, TRUE, FALSE);
+
+ipRust = ItemPropertyDamageVulnerability(IP_CONST_DAMAGETYPE_COLD, IP_CONST_DAMAGEVULNERABILITY_5_PERCENT);
+
+IPSafeAddItemProperty(oItemSlot, ipRust, 0.0f, X2_IP_ADDPROP_POLICY_IGNORE_EXISTING, TRUE, FALSE);
+
+FloatingTextStringOnCreature("Your armor is getting rusty/wearing off...", oPC, FALSE);
+}
+
+oItemSlot = GetItemInSlot(INVENTORY_SLOT_LEFTHAND, oPC);
+
+if (GetIsObjectValid(oItemSlot) &&
+GetLocalInt(oItemSlot, "RustProtect") != 1 &&
+d20(1) >= 18 &&
+GetBaseItemType(oItemSlot) == BASE_ITEM_SMALLSHIELD ||
+GetIsObjectValid(oItemSlot) &&
+GetLocalInt(oItemSlot, "Oiled1") != 1 &&
+d20(1) >= 18 &&
+GetBaseItemType(oItemSlot) == BASE_ITEM_SMALLSHIELD ||
+GetIsObjectValid(oItemSlot) &&
+GetLocalInt(oItemSlot, "RustProtect") != 1 &&
+d20(1) >= 18 &&
+GetBaseItemType(oItemSlot) == BASE_ITEM_LARGESHIELD ||
+GetIsObjectValid(oItemSlot) &&
+GetLocalInt(oItemSlot, "Oiled1") != 1 &&
+d20(1) >= 18 &&
+GetBaseItemType(oItemSlot) == BASE_ITEM_LARGESHIELD ||
+GetIsObjectValid(oItemSlot) &&
+GetLocalInt(oItemSlot, "RustProtect") != 1 &&
+d20(1) >= 18 &&
+GetBaseItemType(oItemSlot) == BASE_ITEM_TOWERSHIELD ||
+GetIsObjectValid(oItemSlot) &&
+GetLocalInt(oItemSlot, "Oiled1") != 1 &&
+d20(1) >= 18 &&
+GetBaseItemType(oItemSlot) == BASE_ITEM_TOWERSHIELD)
+{
+ipRust = ItemPropertyDecreaseAC(IP_CONST_ACMODIFIERTYPE_ARMOR, 1);
+
+IPSafeAddItemProperty(oItemSlot, ipRust, 0.0f, X2_IP_ADDPROP_POLICY_IGNORE_EXISTING, TRUE, FALSE);
+
+ipRust = ItemPropertyDamageVulnerability(IP_CONST_DAMAGETYPE_COLD, IP_CONST_DAMAGEVULNERABILITY_5_PERCENT);
+
+IPSafeAddItemProperty(oItemSlot, ipRust, 0.0f, X2_IP_ADDPROP_POLICY_IGNORE_EXISTING, TRUE, FALSE);
+
+FloatingTextStringOnCreature("Your shield is getting rusty/wearing off...", oPC, FALSE);
+}
+
+oItemSlot = GetItemInSlot(INVENTORY_SLOT_HEAD, oPC);
+
+if (GetIsObjectValid(oItemSlot) &&
+GetLocalInt(oItemSlot, "RustProtect") != 1 &&
+d20(1) >= 18 ||
+GetIsObjectValid(oItemSlot) &&
+GetLocalInt(oItemSlot, "Oiled1") != 1 &&
+d20(1) >= 18)
+{
+ipRust = ItemPropertyDecreaseAC(IP_CONST_ACMODIFIERTYPE_ARMOR, 1);
+
+IPSafeAddItemProperty(oItemSlot, ipRust, 0.0f, X2_IP_ADDPROP_POLICY_IGNORE_EXISTING, TRUE, FALSE);
+
+ipRust = ItemPropertyDamageVulnerability(IP_CONST_DAMAGETYPE_COLD, IP_CONST_DAMAGEVULNERABILITY_5_PERCENT);
+
+IPSafeAddItemProperty(oItemSlot, ipRust, 0.0f, X2_IP_ADDPROP_POLICY_IGNORE_EXISTING, TRUE, FALSE);
+
+FloatingTextStringOnCreature("Your helmet is getting rusty/wearing off...", oPC, FALSE);
+}
+
+oItemSlot = GetItemInSlot(INVENTORY_SLOT_RIGHTHAND, oPC);
+
+if (GetIsObjectValid(oItemSlot) &&
+GetLocalInt(oItemSlot, "RustProtect") != 1 &&
+d20(1) >= 18 &&
+GetBaseItemType(oItemSlot) != BASE_ITEM_MAGICROD &&
+GetBaseItemType(oItemSlot) != BASE_ITEM_MAGICSTAFF &&
+GetBaseItemType(oItemSlot) != BASE_ITEM_MAGICWAND &&
+GetBaseItemType(oItemSlot) != BASE_ITEM_QUARTERSTAFF &&
+GetWeaponRanged(oItemSlot) == FALSE ||
+GetIsObjectValid(oItemSlot) &&
+GetLocalInt(oItemSlot, "Oiled1") != 1 &&
+d20(1) >= 18 &&
+GetBaseItemType(oItemSlot) != BASE_ITEM_MAGICROD &&
+GetBaseItemType(oItemSlot) != BASE_ITEM_MAGICSTAFF &&
+GetBaseItemType(oItemSlot) != BASE_ITEM_MAGICWAND &&
+GetBaseItemType(oItemSlot) != BASE_ITEM_QUARTERSTAFF &&
+GetWeaponRanged(oItemSlot) == FALSE)
+{
+ipRust = ItemPropertyDamagePenalty(1);
+
+IPSafeAddItemProperty(oItemSlot, ipRust, 0.0f, X2_IP_ADDPROP_POLICY_IGNORE_EXISTING, TRUE, FALSE);
+
+ipRust = ItemPropertyDamageVulnerability(IP_CONST_DAMAGETYPE_COLD, IP_CONST_DAMAGEVULNERABILITY_5_PERCENT);
+
+IPSafeAddItemProperty(oItemSlot, ipRust, 0.0f, X2_IP_ADDPROP_POLICY_IGNORE_EXISTING, TRUE, FALSE);
+
+FloatingTextStringOnCreature("Your weapon is getting rusty/wearing off...", oPC, FALSE);
+}
+
+}
+oPC = GetNextPC();
+}
+
+DelayCommand(800.0 + IntToFloat(Random(1000)), SignalEvent(OBJECT_SELF, EventUserDefined(204)));
+
+break;
+
+//Check if player have a cloak, boots or a belt
+case 205:
+
+oPC = GetFirstPC();
+
+while (GetIsObjectValid(oPC))
+{
+
+if (!GetIsObjectValid(GetItemInSlot(INVENTORY_SLOT_CLOAK, oPC)) &&
+GetIsAreaInterior(GetArea(oPC)) == FALSE &&
+GetIsPC(oPC) &&
+!GetIsDM(oPC) &&
+!GetIsDead(oPC))
+{
+
+if (!GetHasSpellEffect(SPELL_POLYMORPH_SELF, oPC) &&
+!GetHasSpellEffect(SPELL_SHAPECHANGE, oPC) &&
+!GetHasSpellEffect(SPELL_TENSERS_TRANSFORMATION, oPC) &&
+!GetHasFeatEffect(FEAT_WILD_SHAPE, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_1, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_2, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_3, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_4, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_WILD_SHAPE_UNDEAD, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_WILD_SHAPE_DRAGON, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_DRUID_INFINITE_WILDSHAPE, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_1, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_2, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_3, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_4, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_OUTSIDER_SHAPE, oPC) &&
+!GetIsDM(oPC))
+{
+
+if (GetRacialType(oPC) != RACIAL_TYPE_ELF &&
+GetRacialType(oPC) != RACIAL_TYPE_DWARF &&
+GetRacialType(oPC) != RACIAL_TYPE_ANIMAL &&
+GetRacialType(oPC) != RACIAL_TYPE_ELEMENTAL &&
+GetRacialType(oPC) != RACIAL_TYPE_DRAGON &&
+GetRacialType(oPC) != RACIAL_TYPE_CONSTRUCT &&
+GetRacialType(oPC) != RACIAL_TYPE_UNDEAD)
+{
+effect eCold = EffectDamageImmunityDecrease(DAMAGE_TYPE_COLD, 1);
+if (GetStringLeft(GetName(GetArea(oPC)), 1) != "*")// &&
+//GetName(GetArea(oPC)) != "*The Academy")
+{
+SendMessageToPC(oPC, "You caught a cold. Better find a cloak to wear to avoid this in the future.");
+ApplyEffectToObject(DURATION_TYPE_TEMPORARY, eCold, oPC, 600.0);
+}
+else
+{
+
+if (GetName(GetArea(oPC)) == "*Starting Area")
+{
+SendMessageToPC(oPC, "If you weren't in the starting area, you would have caught a cold for not wearing a cloak, it is recommended that you buy a cloak, boots and a belt before you leave this area.");
+}
+
+}
+
+}
+
+}
+
+}
+
+if (!GetIsObjectValid(GetItemInSlot(INVENTORY_SLOT_BOOTS, oPC)) &&
+GetIsPC(oPC) &&
+!GetIsDM(oPC) &&
+!GetIsDead(oPC))
+{
+
+if (!GetHasSpellEffect(SPELL_POLYMORPH_SELF, oPC) &&
+!GetHasSpellEffect(SPELL_SHAPECHANGE, oPC) &&
+!GetHasSpellEffect(SPELL_TENSERS_TRANSFORMATION, oPC) &&
+!GetHasFeatEffect(FEAT_WILD_SHAPE, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_1, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_2, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_3, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_4, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_WILD_SHAPE_UNDEAD, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_WILD_SHAPE_DRAGON, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_DRUID_INFINITE_WILDSHAPE, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_1, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_2, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_3, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_4, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_OUTSIDER_SHAPE, oPC) &&
+!GetIsDM(oPC))
+{
+
+if (!GetHasFeat(FEAT_TRACKLESS_STEP, oPC))
+{
+
+if (GetRacialType(oPC) != RACIAL_TYPE_HALFLING)
+{
+effect eFeetsHurt = EffectMovementSpeedDecrease(5);
+if (GetStringLeft(GetName(GetArea(oPC)), 1) != "*")// &&
+//GetName(GetArea(oPC)) != "*The Academy"))
+{
+SendMessageToPC(oPC, "Your feet are starting to hurt; better find some boots to avoid this in the future.");
+ApplyEffectToObject(DURATION_TYPE_TEMPORARY, eFeetsHurt, oPC, 600.0);
+}
+else
+{
+
+if (GetName(GetArea(oPC)) == "*Starting Area")
+{
+SendMessageToPC(oPC, "If you weren't in this area, your feets would start to hurt for not wearing boots, it is recommended that you buy a cloak, boots and a belt before you leave this area.");
+}
+
+}
+
+}
+
+}
+
+}
+
+}
+
+if (!GetIsObjectValid(GetItemInSlot(INVENTORY_SLOT_BELT, oPC)) &&
+GetIsPC(oPC) &&
+!GetIsDM(oPC) &&
+!GetIsDead(oPC))
+{
+
+if (!GetHasSpellEffect(SPELL_POLYMORPH_SELF, oPC) &&
+!GetHasSpellEffect(SPELL_SHAPECHANGE, oPC) &&
+!GetHasSpellEffect(SPELL_TENSERS_TRANSFORMATION, oPC) &&
+!GetHasFeatEffect(FEAT_WILD_SHAPE, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_1, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_2, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_3, oPC) &&
+!GetHasFeatEffect(FEAT_GREATER_WILDSHAPE_4, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_WILD_SHAPE_UNDEAD, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_WILD_SHAPE_DRAGON, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_DRUID_INFINITE_WILDSHAPE, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_1, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_2, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_3, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_SHIFTER_INFINITE_WILDSHAPE_4, oPC) &&
+!GetHasFeatEffect(FEAT_EPIC_OUTSIDER_SHAPE, oPC) &&
+!GetIsDM(oPC))
+{
+
+if (GetLevelByClass(CLASS_TYPE_MONK, oPC) <= 0 &&
+GetIsInCombat(oPC))
+{
+effect eNoBelt = EffectKnockdown();
+SendMessageToPC(oPC, "You accidentally stepped on your pants and fell down. Better wear a belt to avoid this in the future.");
+ApplyEffectToObject(DURATION_TYPE_TEMPORARY, eNoBelt, oPC, 1.0);
+}
+
+}
+
+}
+oPC = GetNextPC();
+}
+
+DelayCommand(100.0 + IntToFloat(Random(100)), SignalEvent(OBJECT_SELF, EventUserDefined(205)));
+
+break;
+
+//Save player location
+case 206:
+
+oPC = GetFirstPC();
+
+while (GetIsObjectValid(oPC))
+{
+
+object oPlayerArea = GetArea(oPC);
+location lPlayer = GetLocation(oPC);
+vector vPlayerLocation = GetPositionFromLocation(lPlayer);
+float fPlayerFacing = GetFacing(oPC);
+
+location lLocation = Location(oPlayerArea, vPlayerLocation, fPlayerFacing);
+
+if (GetStringLeft(GetName(GetArea(oPC)), 1) != "*" &&
+/*GetName(GetArea(oPC)) != "*The Academy")*/
+GetName(oPlayerArea) != "" &&
+oPlayerArea != OBJECT_INVALID)
+{
+SetCampaignLocation("Valikorlia", "PlayerLocation1", lLocation, oPC);
+}
+
+oPC = GetNextPC();
+}
+
+DelayCommand(10.0, SignalEvent(OBJECT_SELF, EventUserDefined(206)));
+
+break;
+
+//Spawn foot tracks
+case 207:
+
+oPC = GetFirstPC();
+
+while (GetIsObjectValid(oPC))
+{
+
+object oFootTracks;
+object oPlayerArea = GetArea(oPC);
+location lPlayer = GetLocation(oPC);
+
+float fDecayTime = 180.0;
+
+if (!GetIsDM(oPC) &&
+GetStringLeft(GetName(GetArea(oPC)), 1) != "*" &&
+/*GetName(GetArea(oPC)) != "*The Academy") */
+GetName(oPlayerArea) != "" &&
+oPlayerArea != OBJECT_INVALID)
+{
+
+if (GetCurrentAction(oPC) == ACTION_MOVETOPOINT &&
+!GetHasFeat(FEAT_TRACKLESS_STEP, oPC) &&
+GetActionMode(oPC, ACTION_MODE_STEALTH) == FALSE ||
+GetCurrentAction(oPC) == ACTION_MOVETOPOINT &&
+!GetHasFeat(FEAT_TRACKLESS_STEP, oPC) &&
+GetActionMode(oPC, ACTION_MODE_STEALTH) == TRUE &&
+!GetIsSkillSuccessful(oPC, SKILL_MOVE_SILENTLY, d20(1) + 10))
+{
+
+if (GetCurrentHitPoints(oPC) <= (GetMaxHitPoints(oPC) / 4) &&
+GetCreatureSize(oPC) != CREATURE_SIZE_SMALL &&
+GetCreatureSize(oPC) != CREATURE_SIZE_TINY &&
+GetCreatureSize(oPC) != CREATURE_SIZE_INVALID)
+{
+oFootTracks = CreateObject(OBJECT_TYPE_PLACEABLE, "footsteps002", lPlayer, TRUE);
+SetLocalString(oFootTracks, "TracksOwner1", GetName(oPC));
+
+DelayCommand(fDecayTime - 0.5, SetPlotFlag(oFootTracks, FALSE));
+DestroyObject(oFootTracks, fDecayTime);
+}
+else
+if (GetIsObjectValid(GetItemInSlot(INVENTORY_SLOT_BOOTS, oPC)) &&
+GetCreatureSize(oPC) != CREATURE_SIZE_SMALL &&
+GetCreatureSize(oPC) != CREATURE_SIZE_TINY &&
+GetCreatureSize(oPC) != CREATURE_SIZE_INVALID)
+{
+oFootTracks = CreateObject(OBJECT_TYPE_PLACEABLE, "footsteps001", lPlayer, TRUE);
+SetLocalString(oFootTracks, "TracksOwner1", GetName(oPC));
+
+DelayCommand(fDecayTime - 0.5, SetPlotFlag(oFootTracks, FALSE));
+DestroyObject(oFootTracks, fDecayTime);
+}
+else
+if (!GetIsObjectValid(GetItemInSlot(INVENTORY_SLOT_BOOTS, oPC)) &&
+GetCreatureSize(oPC) != CREATURE_SIZE_SMALL &&
+GetCreatureSize(oPC) != CREATURE_SIZE_TINY &&
+GetCreatureSize(oPC) != CREATURE_SIZE_INVALID)
+{
+oFootTracks = CreateObject(OBJECT_TYPE_PLACEABLE, "footsteps003", lPlayer, TRUE);
+SetLocalString(oFootTracks, "TracksOwner1", GetName(oPC));
+
+DelayCommand(fDecayTime - 0.5, SetPlotFlag(oFootTracks, FALSE));
+DestroyObject(oFootTracks, fDecayTime);
+}
+else
+if (GetCurrentHitPoints(oPC) <= (GetMaxHitPoints(oPC) / 4) &&
+GetCreatureSize(oPC) == CREATURE_SIZE_SMALL ||
+GetCurrentHitPoints(oPC) <= (GetMaxHitPoints(oPC) / 4) &&
+GetCreatureSize(oPC) == CREATURE_SIZE_TINY)
+{
+oFootTracks = CreateObject(OBJECT_TYPE_PLACEABLE, "footsteps006", lPlayer, TRUE);
+SetLocalString(oFootTracks, "TracksOwner1", GetName(oPC));
+
+DelayCommand(fDecayTime - 0.5, SetPlotFlag(oFootTracks, FALSE));
+DestroyObject(oFootTracks, fDecayTime);
+}
+else
+if (!GetIsObjectValid(GetItemInSlot(INVENTORY_SLOT_BOOTS, oPC)) &&
+GetCreatureSize(oPC) == CREATURE_SIZE_SMALL ||
+!GetIsObjectValid(GetItemInSlot(INVENTORY_SLOT_BOOTS, oPC)) &&
+GetCreatureSize(oPC) == CREATURE_SIZE_TINY)
+{
+oFootTracks = CreateObject(OBJECT_TYPE_PLACEABLE, "footsteps004", lPlayer, TRUE);
+SetLocalString(oFootTracks, "TracksOwner1", GetName(oPC));
+
+DelayCommand(fDecayTime - 0.5, SetPlotFlag(oFootTracks, FALSE));
+DestroyObject(oFootTracks, fDecayTime);
+}
+else
+if (GetIsObjectValid(GetItemInSlot(INVENTORY_SLOT_BOOTS, oPC)) &&
+GetCreatureSize(oPC) == CREATURE_SIZE_SMALL ||
+GetIsObjectValid(GetItemInSlot(INVENTORY_SLOT_BOOTS, oPC)) &&
+GetCreatureSize(oPC) == CREATURE_SIZE_TINY)
+{
+oFootTracks = CreateObject(OBJECT_TYPE_PLACEABLE, "footsteps005", lPlayer, TRUE);
+SetLocalString(oFootTracks, "TracksOwner1", GetName(oPC));
+
+DelayCommand(fDecayTime - 0.5, SetPlotFlag(oFootTracks, FALSE));
+DestroyObject(oFootTracks, fDecayTime);
+}
+
+
+}
+
+}
+
+oPC = GetNextPC();
+}
+
+DelayCommand(60.0, SignalEvent(OBJECT_SELF, EventUserDefined(207)));
+
+break;
+
+
+/* Check for daily incomes/problems for cities */
+case 208:
+
+if (GetCampaignInt("Valikorlia", "DayTimeCityCheck1", oModule) != GetCalendarDay())
+{
+
+oPC = GetFirstPC();
+
+while (GetIsObjectValid(oPC))
+{
+
+sArmySide = "TaronArmyRank";
+iPlayerRank = GetCampaignInt("Valikorlia", sArmySide, oPC);
+
+if (iPlayerRank > 0)
+{
+SendMessageToPC(oPC, "It's pay day!");
+
+SetCampaignInt("Valikorlia", "" + sArmySide + "ArmySupplyGive1", 1, oPC);
+
+if (iPlayerRank == 1)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 100, oPC);
+}
+
+if (iPlayerRank == 2)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 200, oPC);
+}
+
+if (iPlayerRank == 3)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 500, oPC);
+}
+
+if (iPlayerRank == 4)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 1000, oPC);
+}
+
+if (iPlayerRank == 5)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 2000, oPC);
+}
+
+if (iPlayerRank == 6)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 4000, oPC);
+}
+
+if (iPlayerRank == 7)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 10000, oPC);
+}
+
+}
+
+sArmySide = "DalmarArmyRank";
+iPlayerRank = GetCampaignInt("Valikorlia", sArmySide, oPC);
+
+if (iPlayerRank > 0)
+{
+SendMessageToPC(oPC, "It's pay day!");
+
+SetCampaignInt("Valikorlia", "" + sArmySide + "ArmySupplyGive1", 1, oPC);
+
+if (iPlayerRank == 1)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 100, oPC);
+}
+
+if (iPlayerRank == 2)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 200, oPC);
+}
+
+if (iPlayerRank == 3)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 500, oPC);
+}
+
+if (iPlayerRank == 4)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 1000, oPC);
+}
+
+if (iPlayerRank == 5)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 2000, oPC);
+}
+
+if (iPlayerRank == 6)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 4000, oPC);
+}
+
+if (iPlayerRank == 7)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 10000, oPC);
+}
+
+}
+
+sArmySide = "EmpyriaArmyRank";
+iPlayerRank = GetCampaignInt("Valikorlia", sArmySide, oPC);
+
+if (iPlayerRank > 0)
+{
+SendMessageToPC(oPC, "It's pay day!");
+
+SetCampaignInt("Valikorlia", "" + sArmySide + "ArmySupplyGive1", 1, oPC);
+
+if (iPlayerRank == 1)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 100, oPC);
+}
+
+if (iPlayerRank == 2)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 200, oPC);
+}
+
+if (iPlayerRank == 3)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 500, oPC);
+}
+
+if (iPlayerRank == 4)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 1000, oPC);
+}
+
+if (iPlayerRank == 5)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 2000, oPC);
+}
+
+if (iPlayerRank == 6)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 4000, oPC);
+}
+
+if (iPlayerRank == 7)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 10000, oPC);
+}
+
+}
+
+sArmySide = "AthediaArmyRank";
+iPlayerRank = GetCampaignInt("Valikorlia", sArmySide, oPC);
+
+if (iPlayerRank > 0)
+{
+SendMessageToPC(oPC, "It's pay day!");
+
+SetCampaignInt("Valikorlia", "" + sArmySide + "ArmySupplyGive1", 1, oPC);
+
+if (iPlayerRank == 1)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 100, oPC);
+}
+
+if (iPlayerRank == 2)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 200, oPC);
+}
+
+if (iPlayerRank == 3)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 500, oPC);
+}
+
+if (iPlayerRank == 4)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 1000, oPC);
+}
+
+if (iPlayerRank == 5)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 2000, oPC);
+}
+
+if (iPlayerRank == 6)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 4000, oPC);
+}
+
+if (iPlayerRank == 7)
+{
+SetCampaignInt("Valikorlia", "" + sArmySide + "PayDay1", 10000, oPC);
+}
+
+}
+
+SetCampaignInt("Valikorlia", "DayType1", Random(9) + 1, oModule);
+
+if (GetCampaignInt("Valikorlia", "DayType1", oModule) == 1)
+{
+sDayType1 = "Silver Pearl";
+}
+
+if (GetCampaignInt("Valikorlia", "DayType1", oModule) == 2)
+{
+sDayType1 = "Golden Tongue";
+}
+
+if (GetCampaignInt("Valikorlia", "DayType1", oModule) == 3)
+{
+sDayType1 = "Grim Reaper";
+}
+
+if (GetCampaignInt("Valikorlia", "DayType1", oModule) == 4)
+{
+sDayType1 = "Healthy Harvest";
+
+ApplyEffectToObject(DURATION_TYPE_TEMPORARY, EffectTemporaryHitpoints(Random(20) + 1), oPC, HoursToSeconds(24));
+}
+
+if (GetCampaignInt("Valikorlia", "DayType1", oModule) == 5)
+{
+sDayType1 = "Calm Winds";
+}
+
+if (GetCampaignInt("Valikorlia", "DayType1", oModule) == 6)
+{
+sDayType1 = "Fast Dagger";
+
+ApplyEffectToObject(DURATION_TYPE_TEMPORARY, EffectHaste(), oPC, HoursToSeconds(1));
+}
+
+if (GetCampaignInt("Valikorlia", "DayType1", oModule) == 7)
+{
+sDayType1 = "Tolerant Mind";
+
+ApplyEffectToObject(DURATION_TYPE_TEMPORARY, EffectSavingThrowIncrease(SAVING_THROW_ALL, 1), oPC, HoursToSeconds(3));
+}
+
+if (GetCampaignInt("Valikorlia", "DayType1", oModule) == 8)
+{
+sDayType1 = "Fulfilled Ogre";
+}
+
+if (GetCampaignInt("Valikorlia", "DayType1", oModule) == 9)
+{
+sDayType1 = "Thirsty Rock";
+}
+
+SendMessageToPC(oPC, "A new day begin... The day of the " + sDayType1 + ", The time is: Year " + IntToString(GetCalendarYear()) + " Month " + IntToString(GetCalendarMonth()) + " Day " + IntToString(GetCalendarDay()) + ".");
+oPC = GetNextPC();
+}
+
+DelayCommand(2.0, ExecuteScript("citydayresult1", oModule));
+
+SetCampaignInt("Valikorlia", "ModuleLoad1", 0, oModule);
+SetCampaignInt("Valikorlia", "DayTimeCityCheck1", GetCalendarDay());
+}
+
+DelayCommand(60.0, SignalEvent(OBJECT_SELF, EventUserDefined(208)));
+
+break;
+
+/* Check for DM access */
+case 209:
+
+oPC = GetFirstPC();
+
+while (GetIsObjectValid(oPC))
+{
+
+if (GetIsDM(oPC) &&
+GetPCPlayerName(oPC) != "Drakaden" &&
+GetPCPlayerName(oPC) != "Clive-X" &&
+GetPCPlayerName(oPC) != "Undertide428")
+{
+DelayCommand(1.0, BootPC(oPC));
+}
+
+oPC = GetNextPC();
+}
+
+DelayCommand(10.0, SignalEvent(OBJECT_SELF, EventUserDefined(209)));
+
+break;
+
+/* Check for mercenary guild missions */
+case 210:
+
+oPC = GetFirstPC();
+
+while (GetIsObjectValid(oPC))
+{
+
+if (GetCampaignInt("Valikorlia", "GuildJoin", oPC) == 5 &&
+GetCampaignInt("Valikorlia", "MercenaryUndergoing1", oPC) == 1)
+{
+
+object oMissionTarget1;
+object oContract = GetItemPossessedBy(oPC, "MercenaryContract1");
+
+int iMissionNumberType1 = GetCampaignInt("Valikorlia", "MissionNumberType1", oPC);
+int iIdentification1 = FindSubString(GetName(GetArea(oPC)), "City");
+int iIdentification2 = FindSubString(GetName(GetArea(oPC)), "House");
+int iIdentification3 = FindSubString(GetName(GetArea(oPC)), "Temple");
+int iIdentification4 = FindSubString(GetName(GetArea(oPC)), "Planar");
+int iIdentification5 = FindSubString(GetName(GetArea(oPC)), "Castle");
+int iIdentification6 = FindSubString(GetName(GetArea(oPC)), "Village");
+int iIdentification7 = FindSubString(GetName(GetArea(oPC)), "Sea Travel");
+int iIdentification8 = FindSubString(GetName(GetArea(oPC)), "Pirates!");
+
+int iFindDifficulty;
+
+string sTemplate = GetCampaignString("Valikorlia", "MercenaryMission1Template1", oPC);
+string sTemplate2;
+
+if (GetCampaignInt("Valikorlia", "GuildRank", oPC) == 1)
+{
+iFindDifficulty = 70;
+}
+else
+if (GetCampaignInt("Valikorlia", "GuildRank", oPC) == 2)
+{
+iFindDifficulty = 80;
+}
+else
+if (GetCampaignInt("Valikorlia", "GuildRank", oPC) == 3)
+{
+iFindDifficulty = 85;
+}
+else
+if (GetCampaignInt("Valikorlia", "GuildRank", oPC) == 4)
+{
+iFindDifficulty = 90;
+}
+else
+{
+iFindDifficulty = 50;
+}
+
+if (d100(1) >= iFindDifficulty &&
+GetName(GetArea(oPC)) != "" &&
+GetStringLeft(GetName(GetArea(oPC)), 1) != "*" &&
+iIdentification1 < 0 &&
+iIdentification2 < 0 &&
+iIdentification3 < 0 &&
+iIdentification4 < 0 &&
+iIdentification5 < 0 &&
+iIdentification6 < 0 &&
+iIdentification7 < 0 &&
+iIdentification8 < 0 &&
+GetLocalInt(oContract, "MissionSpawned1") != 1)
+{
+
+if (GetIsObjectValid(GetNearestObjectByTag("MercenaryMission1Target1", oPC)) ||
+GetIsObjectValid(GetNearestObjectByTag("MercenaryMission2Target1", oPC)))
+{
+FloatingTextStringOnCreature("There is traces of something else in this area, your objective is most likely not here.", oPC, TRUE);
+}
+else
+if (!GetIsObjectValid(GetNearestObjectByTag("MercenaryMission1Target1", oPC)) &&
+!GetIsObjectValid(GetNearestObjectByTag("MercenaryMission2Target1", oPC)))
+{
+
+vector vVector1;
+vVector1 = Vector(IntToFloat(Random(91) + 10), IntToFloat(Random(91) + 10), 0.0);
+
+int iThugs = GetCampaignInt("Valikorlia", "MercenaryMissionNumberOfThugs1", oPC);
+
+location lLocation = Location(GetArea(oPC), vVector1, 180.0);
+
+if (iMissionNumberType1 == 1)
+{
+oMissionTarget1 = CreateObject(OBJECT_TYPE_CREATURE, sTemplate, lLocation, TRUE);
+SetLocalString(oMissionTarget1, "MissionBearer1", GetName(oPC));
+}
+
+if (iMissionNumberType1 == 2)
+{
+
+oMissionTarget1 = CreateObject(OBJECT_TYPE_CREATURE, "null1", lLocation, TRUE);
+
+lLocation = GetLocation(oMissionTarget1);
+DestroyObject(oMissionTarget1, 0.5);
+
+oMissionTarget1 = CreateObject(OBJECT_TYPE_PLACEABLE, sTemplate, lLocation, TRUE);
+
+AssignCommand(oMissionTarget1, SetFacing(IntToFloat(Random(360))));
+SetLocalInt(oMissionTarget1, "MissionSubNumber1", GetCampaignInt("Valikorlia", "MissionSubNumber1", oPC));
+SetLocalInt(oMissionTarget1, "TotalTents1", GetCampaignInt("Valikorlia", "ObjectivesRemaining1", oPC));
+SetLocalInt(oMissionTarget1, "MaxMonsterSpawn1", iThugs);
+}
+
+location lLocation2 = GetLocation(oMissionTarget1);
+
+SetLocalString(oMissionTarget1, "MissionBearer1", GetName(oPC));
+
+if (GetCampaignInt("Valikorlia", "GuildRank", oPC) == 1)
+{
+sTemplate2 = "thugminion1";
+}
+else
+if (GetCampaignInt("Valikorlia", "GuildRank", oPC) == 2)
+{
+sTemplate2 = "thugminion2";
+}
+else
+if (GetCampaignInt("Valikorlia", "GuildRank", oPC) == 3)
+{
+sTemplate2 = "thugminion3";
+}
+else
+if (GetCampaignInt("Valikorlia", "GuildRank", oPC) == 4)
+{
+sTemplate2 = "thugminion4";
+}
+else
+{
+sTemplate2 = "thugminion1";
+}
+
+if (iMissionNumberType1 == 1)
+{
+
+if (iThugs < iThugs)
+{
+//SendMessageToPC(oPC, "Thug spawn number is bugged, it equal to -1 and below.");
+}
+else
+if (iThugs == 0)
+{
+//SendMessageToPC(oPC, "Thug spawn number is bugged, it equal to 0.");
+}
+else
+if (iThugs == 1)
+{
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+}
+else
+if (iThugs == 2)
+{
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+}
+else
+if (iThugs == 3)
+{
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+}
+else
+if (iThugs == 4)
+{
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+}
+else
+if (iThugs >= 5)
+{
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+CreateObject(OBJECT_TYPE_CREATURE, sTemplate2, lLocation2, FALSE);
+}
+
+}
+
+DelayCommand(6.0, FloatingTextStringOnCreature("You detect traces of your job objective in this area.", oPC, TRUE));
+SetLocalInt(oContract, "MissionSpawned1", 1);
+}
+
+}
+
+}
+
+oPC = GetNextPC();
+}
+DelayCommand(60.0, SignalEvent(OBJECT_SELF, EventUserDefined(210)));
+
+break;
+
+/* Check for Timed XP if player broke a rule or not */
+case 211:
+
+oPC = GetFirstPC();
+oNearestPC = GetNearestCreature(CREATURE_TYPE_PLAYER_CHAR, PLAYER_CHAR_IS_PC, oPC);
+
+while (GetIsObjectValid(oPC))
+{
+
+oOrb = GetItemPossessedBy(oPC, "StartDifficultyItem1");
+
+if (GetLocalInt(oOrb, "XPSwitch2") == 1)
+{
+
+if (GetCurrentAction(oPC) == ACTION_ATTACKOBJECT ||
+GetCurrentAction(oPC) == ACTION_CASTSPELL ||
+GetCurrentAction(oPC) == ACTION_CLOSEDOOR ||
+GetCurrentAction(oPC) == ACTION_DIALOGOBJECT ||
+GetCurrentAction(oPC) == ACTION_DISABLETRAP ||
+GetCurrentAction(oPC) == ACTION_DROPITEM ||
+GetCurrentAction(oPC) == ACTION_EXAMINETRAP ||
+GetCurrentAction(oPC) == ACTION_FLAGTRAP ||
+GetCurrentAction(oPC) == ACTION_HEAL ||
+GetCurrentAction(oPC) == ACTION_ITEMCASTSPELL ||
+GetCurrentAction(oPC) == ACTION_KIDAMAGE ||
+GetCurrentAction(oPC) == ACTION_LOCK ||
+GetCurrentAction(oPC) == ACTION_OPENDOOR ||
+GetCurrentAction(oPC) == ACTION_OPENLOCK ||
+GetCurrentAction(oPC) == ACTION_PICKPOCKET ||
+GetCurrentAction(oPC) == ACTION_PICKUPITEM ||
+GetCurrentAction(oPC) == ACTION_RECOVERTRAP ||
+GetCurrentAction(oPC) == ACTION_REST ||
+GetCurrentAction(oPC) == ACTION_SETTRAP ||
+GetCurrentAction(oPC) == ACTION_SMITEGOOD ||
+GetCurrentAction(oPC) == ACTION_TAUNT ||
+GetCurrentAction(oPC) == ACTION_USEOBJECT)
+{
+SetCampaignInt("Valikorlia", "TimedXpSpeakingCheck1", 1, oPC);
+}
+
+if (GetMovementRate(oPC) > 0)
+{
+SetCampaignInt("Valikorlia", "TimedXpMovementCheck1", 1, oPC);
+}
+
+if (GetIsObjectValid(oNearestPC) &&
+GetDistanceBetween(oPC, oNearestPC) <= 30.0 &&
+oNearestPC != oPC)
+{
+SetCampaignInt("Valikorlia", "TimedXpPlayerCheck1", 1, oPC);
+}
+
+}
+
+//SendMessageToPC(oPC, "TimedXpSpeakingCheck1: " + IntToString(GetCampaignInt("Valikorlia", "TimedXpSpeakingCheck1", oPC)) + " " + GetName(oPC) + ".");
+//SendMessageToPC(oPC, "TimedXpMovementCheck1: " + IntToString(GetCampaignInt("Valikorlia", "TimedXpMovementCheck1", oPC)) + " " + GetName(oPC) + ".");
+//SendMessageToPC(oPC, "TimedXpPlayerCheck1: " + IntToString(GetCampaignInt("Valikorlia", "TimedXpPlayerCheck1", oPC)) + " " + GetName(oPC) + ".");
+
+oPC = GetNextPC();
+}
+
+DelayCommand(6.0, SignalEvent(OBJECT_SELF, EventUserDefined(211)));
+
+break;
+
+/* Check for Timed XP */
+case 212:
+
+oPC = GetFirstPC();
+
+while (GetIsObjectValid(oPC))
+{
+
+oOrb = GetItemPossessedBy(oPC, "StartDifficultyItem1");
+
+iPlayerSpeak1 = GetCampaignInt("Valikorlia", "TimedXpSpeakingCheck1", oPC);
+iMovementRate1 = GetCampaignInt("Valikorlia", "TimedXpMovementCheck1", oPC);
+iPlayerAround1 = GetCampaignInt("Valikorlia", "TimedXpPlayerCheck1", oPC);
+
+if (GetLocalInt(oOrb, "XPSwitch2") == 1)
+{
+
+//SendMessageToPC(oPC, "TimedXpSpeakingCheck1 2: " + IntToString(GetCampaignInt("Valikorlia", "TimedXpSpeakingCheck1", oPC)) + " " + GetName(oPC) + ".");
+//SendMessageToPC(oPC, "TimedXpMovementCheck1 2: " + IntToString(GetCampaignInt("Valikorlia", "TimedXpMovementCheck1", oPC)) + " " + GetName(oPC) + ".");
+//SendMessageToPC(oPC, "TimedXpPlayerCheck1 2: " + IntToString(GetCampaignInt("Valikorlia", "TimedXpPlayerCheck1", oPC)) + " " + GetName(oPC) + ".");
+
+if (iPlayerSpeak1 == 1 &&
+iMovementRate1 == 1 &&
+iPlayerAround1 == 1)
+{
+
+if (GetHitDice(oPC) <= 20)
+{
+
+if (GetCampaignInt("Valikorlia", "XPPenalty1", oPC) <= 0)
+{
+GiveXPToCreature(oPC, 70);
+}
+else
+if (GetCampaignInt("Valikorlia", "XPPenalty1", oPC) > 0)
+{
+SetCampaignInt("Valikorlia", "XPPenalty1", GetCampaignInt("Valikorlia", "XPPenalty1", oPC) - 70, oPC);
+SendMessageToPC(oPC, "You retrieved some negative experience, your negative experience is now " + IntToString(GetCampaignInt("Valikorlia", "XPPenalty1", oPC)) + ".");
+}
+
+}
+
+if (GetHitDice(oPC) > 20)
+{
+
+if (GetCampaignInt("Valikorlia", "XPPenalty1", oPC) <= 0)
+{
+GiveXPToCreature(oPC, 7);
+}
+else
+if (GetCampaignInt("Valikorlia", "XPPenalty1", oPC) > 0)
+{
+SetCampaignInt("Valikorlia", "XPPenalty1", GetCampaignInt("Valikorlia", "XPPenalty1", oPC) - 7, oPC);
+SendMessageToPC(oPC, "You retrieved some negative experience, your negative experience is now " + IntToString(GetCampaignInt("Valikorlia", "XPPenalty1", oPC)) + ".");
+}
+
+}
+
+SetCampaignInt("Valikorlia", "TimedXpSpeakingCheck1", 0, oPC);
+SetCampaignInt("Valikorlia", "TimedXpMovementCheck1", 0, oPC);
+SetCampaignInt("Valikorlia", "TimedXpPlayerCheck1", 0, oPC);
+
+}
+
+if (iPlayerSpeak1 != 1 ||
+iMovementRate1 != 1 ||
+iPlayerAround1 != 1)
+{
+FloatingTextStringOnCreature("You haven't filled the 3 requirements for timed XP, you are not getting any this time.", oPC, FALSE);
+//SendMessageToPC(oPC, "You haven't filled the 3 requirements for timed XP, you are not getting any this time.");
+if (iPlayerSpeak1 != 1)
+{
+FloatingTextStringOnCreature("You haven't interacted with the world at all.", oPC, FALSE);
+}
+if (iMovementRate1 != 1)
+{
+FloatingTextStringOnCreature("You haven't moved at all.", oPC, FALSE);
+}
+if (iPlayerAround1 != 1)
+{
+FloatingTextStringOnCreature("You haven't been around any players.", oPC, FALSE);
+}
+
+SetCampaignInt("Valikorlia", "TimedXpSpeakingCheck1", 0, oPC);
+SetCampaignInt("Valikorlia", "TimedXpMovementCheck1", 0, oPC);
+SetCampaignInt("Valikorlia", "TimedXpPlayerCheck1", 0, oPC);
+}
+
+}
+
+oPC = GetNextPC();
+}
+
+DelayCommand(600.0, SignalEvent(OBJECT_SELF, EventUserDefined(212)));
+
+break;
+
+/* Check for difficulty setting */
+case 213:
+
+oPC = GetFirstPC();
+
+while (GetIsObjectValid(oPC))
+{
+
+oParty = GetFirstFactionMember(GetFactionLeader(oPC), TRUE);
+
+if (GetCampaignInt("Valikorlia", "MonstersDifficultySetting1", oParty) == 1 &&
+GetCampaignInt("Valikorlia", "MonstersDifficultySetting1", oPC) != 1 ||
+GetCampaignInt("Valikorlia", "MonstersDifficultySetting1", oParty) == 2 &&
+GetCampaignInt("Valikorlia", "MonstersDifficultySetting1", oPC) != 2)
+{
+
+SetCampaignInt("Valikorlia", "MonstersDifficultySetting1", -1, oParty);
+SetCampaignInt("Valikorlia", "MonstersDifficultySetting1", -1, oPC);
+
+FloatingTextStringOnCreature("Difficulty settings were different, difficulty settings for the party is set to Normal.", oParty, FALSE);
+}
+
+oPC = GetNextPC();
+}
+
+DelayCommand(6.0, SignalEvent(OBJECT_SELF, EventUserDefined(213)));
+
+break;
+
+/* No XP Timed Cooldown */
+case 214:
+oPC = GetFirstPC();
+
+while (GetIsObjectValid(oPC))
+{
+
+if (GetCampaignFloat("Valikorlia", "XPSwitch1Cooldown1", oPC) >= 0.1 &&
+GetCampaignInt("Valikorlia", "XPSwitch1", oPC) == 2)
+{
+SetCampaignFloat("Valikorlia", "XPSwitch1Cooldown1", GetCampaignFloat("Valikorlia", "XPSwitch1Cooldown1", oPC) - 6.0, oPC);
+
+if (GetCampaignFloat("Valikorlia", "XPSwitch1Cooldown1", oPC) < 0.0)
+{
+SetCampaignFloat("Valikorlia", "XPSwitch1Cooldown1", 0.0, oPC);
+}
+
+if (GetCampaignFloat("Valikorlia", "XPSwitch1Cooldown1", oPC) <= 0.0)
+{
+FloatingTextStringOnCreature("You can gain experience from monsters again.", oPC, FALSE);
+}
+
+}
+
+oPC = GetNextPC();
+}
+
+DelayCommand(6.0, SignalEvent(OBJECT_SELF, EventUserDefined(214)));
+
+break;
+
+}
+
+}
