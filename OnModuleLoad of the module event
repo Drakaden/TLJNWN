@@ -1,0 +1,58 @@
+//Script made by Drakaden
+void main() {
+
+SetMaxHenchmen(10);
+
+// Everybody is assumed to be living when the module loads
+object oModule = GetModule();
+SetLocalInt(oModule, "EverybodyAlive", TRUE);
+SetCampaignInt("Valikorlia", "ModuleLoad1", 1, oModule);
+
+SetLocalInt(GetModule(),"X2_SWITCH_CROSSAREA_WALKWAYPOINTS", TRUE);
+
+/* Start the export characters timer */
+DelayCommand(300.0, SignalEvent(OBJECT_SELF, EventUserDefined(200)));
+
+/* Change weather */
+DelayCommand(1000.0 + IntToFloat(Random(1000)), SignalEvent(OBJECT_SELF, EventUserDefined(201)));
+
+/* Save the time */
+DelayCommand(300.0, SignalEvent(OBJECT_SELF, EventUserDefined(202)));
+
+/* Keep track of the players factions */
+DelayCommand(20.0, SignalEvent(OBJECT_SELF, EventUserDefined(203)));
+
+/* Weather check for rust */
+DelayCommand(800.0 + IntToFloat(Random(1000)), SignalEvent(OBJECT_SELF, EventUserDefined(204)));
+
+/* Boots, belt and cloak check */
+DelayCommand(100.0 + IntToFloat(Random(100)), SignalEvent(OBJECT_SELF, EventUserDefined(205)));
+
+/* Save player location */
+DelayCommand(10.0, SignalEvent(OBJECT_SELF, EventUserDefined(206)));
+
+/* Spawn foot tracks */
+DelayCommand(60.0, SignalEvent(OBJECT_SELF, EventUserDefined(207)));
+
+/* Check for daily incomes/problems for cities */
+DelayCommand(60.0, SignalEvent(OBJECT_SELF, EventUserDefined(208)));
+
+/* Check for mercenary guild missions */
+DelayCommand(60.0, SignalEvent(OBJECT_SELF, EventUserDefined(210)));
+
+/* Check for timed XP if player broke a rule or not */
+DelayCommand(6.0, SignalEvent(OBJECT_SELF, EventUserDefined(211)));
+
+/* Check for timed XP */
+DelayCommand(600.0, SignalEvent(OBJECT_SELF, EventUserDefined(212)));
+
+/* Check for difficulty setting */
+DelayCommand(60.0, SignalEvent(OBJECT_SELF, EventUserDefined(213)));
+
+/* No XP Timed Cooldown */
+DelayCommand(6.0, SignalEvent(OBJECT_SELF, EventUserDefined(214)));
+
+SetCalendar(GetCampaignInt("Valikorlia", "YearTime"), GetCampaignInt("Valikorlia", "MonthTime"), GetCampaignInt("Valikorlia", "DayTime"));
+SetTime(GetCampaignInt("Valikorlia", "HourTime"), 0, 0, 0);
+
+}
